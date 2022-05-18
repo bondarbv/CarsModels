@@ -14,6 +14,7 @@
 		4776B6CC2832BB2400DB4000 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4776B6CB2832BB2400DB4000 /* Assets.xcassets */; };
 		4776B6CF2832BB2400DB4000 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4776B6CD2832BB2400DB4000 /* LaunchScreen.storyboard */; };
 		4776B6D72833D13700DB4000 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 4776B6D62833D13700DB4000 /* .gitignore */; };
+		4776B6DF2833EE1C00DB4000 /* data.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4776B6DE2833EE1C00DB4000 /* data.plist */; };
 		FEB45811944EA19489944F43 /* Pods_CarsModels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A40A21AC7D0110737F74F7A9 /* Pods_CarsModels.framework */; };
 /* End PBXBuildFile section */
 
@@ -21,12 +22,13 @@
 		4776B6BC2832BB2200DB4000 /* CarsModels.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarsModels.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4776B6BF2832BB2200DB4000 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4776B6C12832BB2200DB4000 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		4776B6C32832BB2200DB4000 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		4776B6C32832BB2200DB4000 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = /Users/bohdan/Desktop/MyApps/CarsModels/CarsModels/ViewControllers/ViewController.swift; sourceTree = "<absolute>"; };
 		4776B6C92832BB2200DB4000 /* CarsModels.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CarsModels.xcdatamodel; sourceTree = "<group>"; };
 		4776B6CB2832BB2400DB4000 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4776B6CE2832BB2400DB4000 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4776B6D02832BB2400DB4000 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4776B6D62833D13700DB4000 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		4776B6DE2833EE1C00DB4000 /* data.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = data.plist; sourceTree = "<group>"; };
 		6E6B6EB291EFB3C1BD881E03 /* Pods-CarsModels.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CarsModels.release.xcconfig"; path = "Target Support Files/Pods-CarsModels/Pods-CarsModels.release.xcconfig"; sourceTree = "<group>"; };
 		879C57E171EBD627D7838223 /* Pods-CarsModels.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CarsModels.debug.xcconfig"; path = "Target Support Files/Pods-CarsModels/Pods-CarsModels.debug.xcconfig"; sourceTree = "<group>"; };
 		A40A21AC7D0110737F74F7A9 /* Pods_CarsModels.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CarsModels.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -76,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				4776B6C82832BB2200DB4000 /* CarsModels.xcdatamodeld */,
+				4776B6DE2833EE1C00DB4000 /* data.plist */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -180,6 +183,7 @@
 			files = (
 				4776B6CF2832BB2400DB4000 /* LaunchScreen.storyboard in Resources */,
 				4776B6D72833D13700DB4000 /* .gitignore in Resources */,
+				4776B6DF2833EE1C00DB4000 /* data.plist in Resources */,
 				4776B6CC2832BB2400DB4000 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

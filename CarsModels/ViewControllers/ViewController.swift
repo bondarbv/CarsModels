@@ -12,26 +12,31 @@ import CoreData
 class ViewController: UIViewController {
     
     var context: NSManagedObjectContext!
+    var car: Car!
+    
+    lazy var dateFormatter: DateFormatter = {
+        let df = DateFormatter()
+        df.dateStyle = .short
+        df.timeStyle = .none
+        return df
+    }()
     
     //MARK: - UI
     let segmentedControl: UISegmentedControl = {
         let carsArray = ["Lambo", "Ferrari", "Merc", "Nissan", "BMW"]
+        let whiteTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+        let blackTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
+        UISegmentedControl.appearance().setTitleTextAttributes(whiteTitleTextAttributes, for: .normal)
+        UISegmentedControl.appearance().setTitleTextAttributes(blackTitleTextAttributes, for: .selected)
         let segmentedControl = UISegmentedControl(items: carsArray)
+        segmentedControl.selectedSegmentIndex = 0
         segmentedControl.addTarget(self, action: #selector(segmentedControllPressed), for: .valueChanged)
         return segmentedControl
     }()
     
-    let carImageView: UIImageView = {
-        let image = UIImage(systemName: "checkmark")
-        let imageView = UIImageView(image: image)
-        return imageView
-    }()
+    let carImageView = UIImageView()
     
-    let myChoiceImageView: UIImageView = {
-        let image = UIImage(systemName: "checkmark")
-        let imageView = UIImageView(image: image)
-        return imageView
-    }()
+    let myChoiceImageView = UIImageView()
     
     let startEngineButton: UIButton = {
         let button = UIButton(type: .system)
@@ -53,28 +58,13 @@ class ViewController: UIViewController {
         return button
     }()
     
-    let modelLabel: UILabel = {
-        let label = UILabel()
-        return label
-    }()
+    let modelLabel = UILabel()
     
-    let lastTimeStartedLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Last time started:"
-        return label
-    }()
+    let lastTimeStartedLabel = UILabel()
     
-    let numberOfTripsLabel: UILabel = {
-       let label = UILabel()
-        label.text = "Number of trips:"
-        return label
-    }()
+    let numberOfTripsLabel = UILabel()
     
-    let ratingLabel: UILabel = {
-       let label = UILabel()
-        label.text = "Rating: X/10.0"
-        return label
-    }()
+    let ratingLabel = UILabel()
     
     //MARK: - ViewLifecycle
     override func viewDidLoad() {
@@ -82,19 +72,133 @@ class ViewController: UIViewController {
         navigationItem.title = "Mark"
         view.backgroundColor = .white
         layout()
+        getDataFromFile()
+        updateSegmentedControll()
     }
     
     //MARK: - Methods
     @objc func segmentedControllPressed() {
-        
+        updateSegmentedControll()
     }
     
     @objc func startEnginePressed() {
-        
+        car.timesDriven += 1
+        car.lastStarted = Date()
+
+        do {
+            try context.save()
+            insetDataFrom(selectedCar: car)
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
     }
     
     @objc func rateItPressed() {
+        let alertController = UIAlertController(title: "Rate it", message: "Rate this car please", preferredStyle: .alert)
         
+        let rateAction = UIAlertAction(title: "Rate", style: .default) { action in
+            if let text = alertController.textFields?.first?.text {
+                self.update(rating: (text as NSString).doubleValue)
+            }
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        
+        alertController.addTextField { textField in
+            textField.keyboardType = .numberPad
+        }
+        
+        alertController.addAction(cancelAction)
+        alertController.addAction(rateAction)
+        
+        present(alertController, animated: true)
+    }
+    
+    private func updateSegmentedControll() {
+        let fetchRequest: NSFetchRequest<Car> = Car.fetchRequest()
+    guard let mark = segmentedControl.titleForSegment(at: segmentedControl.selectedSegmentIndex) else { return }
+        fetchRequest.predicate = NSPredicate(format: "mark == %@", mark)
+        do {
+            let results = try context.fetch(fetchRequest)
+            car = results.first
+            insetDataFrom(selectedCar: car)
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+    }
+    
+    private func update(rating: Double) {
+        car.rating = rating
+        
+        do {
+            try context.save()
+            insetDataFrom(selectedCar: car)
+        } catch let error as NSError {
+            let alertController = UIAlertController(title: "Wrong value", message: "Wrong input", preferredStyle: .alert)
+            let ok = UIAlertAction(title: "OK", style: .default)
+            alertController.addAction(ok)
+            present(alertController, animated: true)
+            print(error.localizedDescription)
+        }
+    }
+    
+    private func insetDataFrom(selectedCar car: Car) {
+        carImageView.image = UIImage(data: car.imageData!)
+        navigationItem.title = car.mark
+        modelLabel.text = car.model
+        lastTimeStartedLabel.text = "Last time started: \(dateFormatter.string(from: car.lastStarted!))"
+        numberOfTripsLabel.text = "Number of trips: \(car.timesDriven)"
+        ratingLabel.text = "Rating: \(car.rating) / 10"
+        myChoiceImageView.isHidden = !(car.myChoice)
+        segmentedControl.backgroundColor = car.tintColor as? UIColor
+    }
+    
+    private func getDataFromFile() {
+        
+        let fetchRequest: NSFetchRequest<Car> = Car.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "mark != nil")
+        
+        var records = 0
+        
+        do {
+            records = try context.count(for: fetchRequest)
+            print("Is Data there already?")
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+        
+        guard records == 0 else { return }
+        
+        guard let pathToFile = Bundle.main.path(forResource: "data", ofType: "plist"),
+              let dataArray = NSArray(contentsOfFile: pathToFile) else { return }
+        for dictionary in dataArray {
+            guard let entity = NSEntityDescription.entity(forEntityName: "Car", in: context) else { return }
+            let car = NSManagedObject(entity: entity, insertInto: context) as! Car
+            
+            let carDictionary = dictionary as! [String: AnyObject]
+            car.mark = carDictionary["mark"] as? String
+            car.model = carDictionary["model"] as? String
+            car.rating = carDictionary["rating"] as! Double
+            car.lastStarted = carDictionary["lastStarted"] as? Date
+            car.timesDriven = carDictionary["timesDriven"] as! Int16
+            car.myChoice = carDictionary["myChoice"] as! Bool
+            
+            guard let imageName = carDictionary["imageName"] as? String else { return }
+            guard let image = UIImage(named: imageName) else { return }
+            let imageData = image.pngData()
+            car.imageData = imageData
+            
+            if let colorDictionary = carDictionary["tintColor"] as? [String: Float] {
+                car.tintColor = getColor(colorDictionary: colorDictionary)
+            }
+        }
+    }
+    
+    private func getColor(colorDictionary: [String: Float]) -> UIColor {
+        guard let red = colorDictionary["red"],
+              let green = colorDictionary["green"],
+              let blue = colorDictionary["blue"] else { return UIColor() }
+        return UIColor(red: CGFloat(red / 255), green: CGFloat(green / 255), blue: CGFloat(blue / 255), alpha: 1.0)
     }
     
     
@@ -118,7 +222,10 @@ class ViewController: UIViewController {
         carImageView.snp.makeConstraints { make in
             make.top.equalTo(modelLabel.snp.bottom).offset(20)
             make.centerX.equalToSuperview()
-            make.width.height.equalTo(200)
+            make.leading.equalTo(view.snp.leading).offset(20)
+            make.trailing.equalTo(view.snp.trailing).inset(20)
+            make.width.equalTo(336)
+            make.height.equalTo(256)
         }
         
         lastTimeStartedLabel.snp.makeConstraints { make in
@@ -137,7 +244,7 @@ class ViewController: UIViewController {
         }
         
         segmentedControl.snp.makeConstraints { make in
-            make.centerY.centerX.equalToSuperview()
+            make.top.equalTo(numberOfTripsLabel.snp.bottom).offset(30)
             make.leading.equalTo(view.snp.leading).offset(20)
             make.trailing.equalTo(view.snp.trailing).inset(20)
         }
